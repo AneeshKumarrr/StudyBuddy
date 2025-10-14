@@ -50,18 +50,18 @@ export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Pet Display */}
           <div>
-            <PetDisplay selectedPet={selectedPet} />
+            <PetDisplay selectedPet={selectedPet} onStartOnboarding={onStartOnboarding} />
           </div>
 
           {/* Focus Timer - Main Component */}
           <div>
-            <FocusTimer />
+            <FocusTimer selectedPet={selectedPet} />
           </div>
         </div>
 
         {/* Session Stats */}
         <div className="mt-8 max-w-6xl mx-auto">
-          <SessionStats />
+          <SessionStats selectedPet={selectedPet} />
         </div>
       </div>
     </div>

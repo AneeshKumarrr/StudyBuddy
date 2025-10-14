@@ -7,9 +7,18 @@ import { formatTime } from '@/lib/utils'
 type SessionType = 'pomodoro' | 'custom'
 type TimerState = 'idle' | 'running' | 'paused' | 'completed'
 
-interface FocusTimerProps {}
+interface FocusTimerProps {
+  selectedPet?: {
+    id: string
+    name: string
+    species: string
+    emoji: string
+    color: string
+    gradient: string
+  }
+}
 
-export function FocusTimer({}: FocusTimerProps) {
+export function FocusTimer({ selectedPet }: FocusTimerProps) {
   const [sessionType, setSessionType] = useState<SessionType>('pomodoro')
   const [customMinutes, setCustomMinutes] = useState(25)
   const [timeLeft, setTimeLeft] = useState(25 * 60) // 25 minutes in seconds
@@ -125,8 +134,61 @@ export function FocusTimer({}: FocusTimerProps) {
   const progress = ((sessionSeconds - timeLeft) / sessionSeconds) * 100
   const effectiveProgress = ((sessionSeconds - effectiveTime) / sessionSeconds) * 100
 
+  const getContainerBorderColor = () => {
+    if (!selectedPet) return 'border-blue-500'
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return 'border-orange-500'
+      case 'stuffy': return 'border-blue-500'
+      case 'muffy': return 'border-purple-500'
+      default: return 'border-blue-500'
+    }
+  }
+
+  const getTimerColor = () => {
+    if (!selectedPet) return '#3b82f6' // blue-500
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return '#f97316' // orange-500
+      case 'stuffy': return '#3b82f6' // blue-500
+      case 'muffy': return '#8b5cf6' // purple-500
+      default: return '#3b82f6' // blue-500
+    }
+  }
+
+  const getSessionButtonColors = () => {
+    if (!selectedPet) return {
+      background: 'bg-gray-100 dark:bg-gray-700',
+      selected: 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white border-2 border-gray-500',
+      unselected: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border-2 border-transparent hover:border-gray-400'
+    }
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return {
+        background: 'bg-orange-100 dark:bg-orange-900/20',
+        selected: 'bg-white dark:bg-gray-600 text-orange-600 dark:text-orange-300 border-2 border-orange-500',
+        unselected: 'text-orange-600 dark:text-orange-300 hover:text-orange-900 dark:hover:text-orange-100 border-2 border-transparent hover:border-orange-400'
+      }
+      case 'stuffy': return {
+        background: 'bg-blue-100 dark:bg-blue-900/20',
+        selected: 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-300 border-2 border-blue-500',
+        unselected: 'text-blue-600 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 border-2 border-transparent hover:border-blue-400'
+      }
+      case 'muffy': return {
+        background: 'bg-purple-100 dark:bg-purple-900/20',
+        selected: 'bg-white dark:bg-gray-600 text-purple-600 dark:text-purple-300 border-2 border-purple-500',
+        unselected: 'text-purple-600 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100 border-2 border-transparent hover:border-purple-400'
+      }
+      default: return {
+        background: 'bg-gray-100 dark:bg-gray-700',
+        selected: 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white border-2 border-gray-500',
+        unselected: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border-2 border-transparent hover:border-gray-400'
+      }
+    }
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border-2 border-purple-500">
+        <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border-2 ${getContainerBorderColor()}`}>
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
           Focus Session
@@ -134,7 +196,7 @@ export function FocusTimer({}: FocusTimerProps) {
 
         {/* Session Type Selection */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+          <div className={`${getSessionButtonColors().background} rounded-lg p-1`}>
             <button
               onClick={() => {
                 setSessionType('pomodoro')
@@ -143,8 +205,8 @@ export function FocusTimer({}: FocusTimerProps) {
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 sessionType === 'pomodoro'
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  ? getSessionButtonColors().selected
+                  : getSessionButtonColors().unselected
               }`}
             >
               Pomodoro (25m)
@@ -157,8 +219,8 @@ export function FocusTimer({}: FocusTimerProps) {
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 sessionType === 'custom'
-                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                  ? getSessionButtonColors().selected
+                  : getSessionButtonColors().unselected
               }`}
             >
               Custom
@@ -208,34 +270,34 @@ export function FocusTimer({}: FocusTimerProps) {
                 r="40"
                 fill="black"
               />
-              {/* Purple progress ring that fills the area between outer and inner rings */}
+              {/* Dynamic progress ring that fills the area between outer and inner rings */}
               <circle
                 cx="50"
                 cy="50"
                 r="42.5"
                 fill="none"
-                stroke="#8b5cf6"
+                stroke={getTimerColor()}
                 strokeWidth="5"
                 strokeDasharray={`${2 * Math.PI * 42.5}`}
                 strokeDashoffset={`${2 * Math.PI * 42.5 * (1 - progress / 100)}`}
                 className="transition-all duration-1000 ease-out"
                 strokeLinecap="round"
               />
-              {/* Outer purple border */}
+              {/* Outer dynamic border */}
               <circle
                 cx="50"
                 cy="50"
                 r="45"
-                stroke="#8b5cf6"
+                stroke={getTimerColor()}
                 strokeWidth="2"
                 fill="none"
               />
-              {/* Inner purple border */}
+              {/* Inner dynamic border */}
               <circle
                 cx="50"
                 cy="50"
                 r="40"
-                stroke="#8b5cf6"
+                stroke={getTimerColor()}
                 strokeWidth="2"
                 fill="none"
               />

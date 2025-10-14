@@ -12,6 +12,8 @@ interface AuthProps {
 export function Auth({ onStartOnboarding }: AuthProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showSignInModal, setShowSignInModal] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   useEffect(() => {
     // Check if Supabase is properly configured
@@ -97,13 +99,115 @@ export function Auth({ onStartOnboarding }: AuthProps) {
     )
   }
 
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true)
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      })
+      if (error) throw error
+      
+      // Close modal on successful redirect
+      setShowSignInModal(false)
+    } catch (error) {
+      console.error('Error signing in with Google:', error)
+      alert('Google sign-in failed. Please make sure Google OAuth is configured in your Supabase project.')
+    } finally {
+      setGoogleLoading(false)
+    }
+  }
+
+  const handleEmailSignIn = async () => {
+    const email = prompt('Enter your email for magic link sign-in:')
+    if (email) {
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email,
+          options: {
+            emailRedirectTo: `${window.location.origin}`,
+          },
+        })
+        if (error) {
+          alert(error.message)
+        } else {
+          alert('Check your email for the magic link!')
+        }
+      } catch (error) {
+        console.error('Error with email sign-in:', error)
+        alert('Email sign-in failed. Please try again.')
+      }
+    }
+  }
+
   return (
-    <button
-      onClick={onStartOnboarding}
-      className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
-    >
-      <LogIn className="w-4 h-4" />
-      Sign in to save your progress
-    </button>
+    <>
+      <button
+        onClick={() => setShowSignInModal(true)}
+        className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+      >
+        <LogIn className="w-4 h-4" />
+        Sign in to save your progress
+      </button>
+
+      {/* Sign In Modal */}
+      {showSignInModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Sign In
+              </h2>
+              <button
+                onClick={() => setShowSignInModal(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <button
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading}
+                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-xl font-medium transition-colors"
+              >
+                {googleLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Connecting...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-5 h-5" />
+                    Continue with Google
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={handleEmailSignIn}
+                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
+              >
+                <UserIcon className="w-5 h-5" />
+                Continue with Email
+              </button>
+            </div>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Sign in to save your progress and sync across devices
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

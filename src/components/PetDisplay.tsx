@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Heart, Star, Coins, Zap, ShoppingBag } from 'lucide-react'
+import { Heart, Star, Coins, Zap, ShoppingBag, RefreshCw } from 'lucide-react'
 import { calculateLevelFromXP, calculateXPProgress } from '@/lib/utils'
 import { Shop } from './Shop'
 
@@ -23,9 +23,10 @@ interface PetDisplayProps {
     color: string
     gradient: string
   }
+  onStartOnboarding?: () => void
 }
 
-export function PetDisplay({ selectedPet }: PetDisplayProps) {
+export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) {
   // Mock pet data - in real app, this would come from Supabase
   const [pet, setPet] = useState<Pet>({
     id: selectedPet?.id || '1',
@@ -276,15 +277,79 @@ export function PetDisplay({ selectedPet }: PetDisplayProps) {
     return backgrounds[selectedPet.id] || backgrounds.wuffy
   }
 
+  const getContainerBorderColor = () => {
+    if (!selectedPet) return 'border-blue-500'
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return 'border-orange-500'
+      case 'stuffy': return 'border-blue-500'
+      case 'muffy': return 'border-purple-500'
+      default: return 'border-blue-500'
+    }
+  }
+
+  const getPetDisplayBorderColor = () => {
+    if (!selectedPet) return 'border-black'
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return 'border-orange-500'
+      case 'stuffy': return 'border-blue-500'
+      case 'muffy': return 'border-purple-500'
+      default: return 'border-black'
+    }
+  }
+
+  const getProgressBarGradient = () => {
+    if (!selectedPet) return 'bg-gradient-to-r from-blue-500 to-purple-500'
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return 'bg-gradient-to-r from-orange-400 to-red-500'
+      case 'stuffy': return 'bg-gradient-to-r from-blue-400 to-indigo-500'
+      case 'muffy': return 'bg-gradient-to-r from-purple-400 to-pink-500'
+      default: return 'bg-gradient-to-r from-blue-500 to-purple-500'
+    }
+  }
+
+  const getButtonColors = () => {
+    if (!selectedPet) return {
+      primary: 'bg-blue-600 hover:bg-blue-700',
+      secondary: 'bg-blue-500 hover:bg-blue-600',
+      disabled: 'bg-blue-400'
+    }
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return {
+        primary: 'bg-orange-600 hover:bg-orange-700',
+        secondary: 'bg-orange-500 hover:bg-orange-600',
+        disabled: 'bg-orange-400'
+      }
+      case 'stuffy': return {
+        primary: 'bg-blue-600 hover:bg-blue-700',
+        secondary: 'bg-blue-500 hover:bg-blue-600',
+        disabled: 'bg-blue-400'
+      }
+      case 'muffy': return {
+        primary: 'bg-purple-600 hover:bg-purple-700',
+        secondary: 'bg-purple-500 hover:bg-purple-600',
+        disabled: 'bg-purple-400'
+      }
+      default: return {
+        primary: 'bg-blue-600 hover:bg-blue-700',
+        secondary: 'bg-blue-500 hover:bg-blue-600',
+        disabled: 'bg-blue-400'
+      }
+    }
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 border-purple-500">
+        <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 ${getContainerBorderColor()}`}>
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 text-center">
         {selectedPet?.name || 'Pet'}: Lvl {pet.level}
       </h3>
 
       {/* Pet Display */}
       <div className="text-center mb-6">
-        <div className="relative w-full h-48 mx-auto mb-4 rounded-lg flex items-center justify-center border-2 border-purple-300 dark:border-purple-600 shadow-lg overflow-hidden">
+        <div className={`relative w-full h-48 mx-auto mb-4 rounded-lg flex items-center justify-center border-2 ${getPetDisplayBorderColor()} shadow-lg overflow-hidden`}>
           {/* Custom pet-specific background */}
           {getPetBackground()}
           
@@ -310,7 +375,7 @@ export function PetDisplay({ selectedPet }: PetDisplayProps) {
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
           <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500"
+            className={`${getProgressBarGradient()} h-3 rounded-full transition-all duration-500`}
             style={{ width: `${progress.progress}%` }}
           />
         </div>
@@ -339,7 +404,7 @@ export function PetDisplay({ selectedPet }: PetDisplayProps) {
         <button
           onClick={feedPet}
           disabled={pet.coins < 10}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-orange-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2 ${getButtonColors().primary} disabled:${getButtonColors().disabled} disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors`}
         >
           <Heart className="w-4 h-4" />
           Feed Pet (10 study coins)
@@ -347,7 +412,7 @@ export function PetDisplay({ selectedPet }: PetDisplayProps) {
 
         <button
           onClick={() => setAnimation('sleep')}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2 ${getButtonColors().secondary} text-white rounded-lg font-medium transition-colors`}
         >
           <Star className="w-4 h-4" />
           Rest
@@ -355,10 +420,27 @@ export function PetDisplay({ selectedPet }: PetDisplayProps) {
 
         <button
           onClick={() => setShowShop(!showShop)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium transition-colors"
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2 ${getButtonColors().primary} text-white rounded-lg font-medium transition-colors`}
         >
           <ShoppingBag className="w-4 h-4" />
           Shop
+        </button>
+
+        <button
+          onClick={() => {
+            if (confirm('Are you sure you want to change your pet? This will reset your progress.')) {
+              localStorage.removeItem('studybuddy_selected_pet')
+              if (onStartOnboarding) {
+                onStartOnboarding()
+              } else {
+                window.location.reload()
+              }
+            }
+          }}
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2 ${getButtonColors().secondary} text-white rounded-lg font-medium transition-colors`}
+        >
+          <RefreshCw className="w-4 h-4" />
+          Change Pet
         </button>
       </div>
 

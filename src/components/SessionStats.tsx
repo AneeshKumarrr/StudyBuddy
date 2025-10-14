@@ -10,9 +10,18 @@ interface SessionData {
   sessions: number
 }
 
-interface SessionStatsProps {}
+interface SessionStatsProps {
+  selectedPet?: {
+    id: string
+    name: string
+    species: string
+    emoji: string
+    color: string
+    gradient: string
+  }
+}
 
-export function SessionStats({}: SessionStatsProps) {
+export function SessionStats({ selectedPet }: SessionStatsProps) {
   const [stats, setStats] = useState({
     todayMinutes: 0,
     weekMinutes: 0,
@@ -115,15 +124,26 @@ export function SessionStats({}: SessionStatsProps) {
     return 'text-green-500'
   }
 
+  const getContainerBorderColor = () => {
+    if (!selectedPet) return 'border-blue-500'
+    
+    switch (selectedPet.id) {
+      case 'wuffy': return 'border-orange-500'
+      case 'stuffy': return 'border-blue-500'
+      case 'muffy': return 'border-purple-500'
+      default: return 'border-blue-500'
+    }
+  }
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+        <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border-2 ${getContainerBorderColor()}`}>
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
         Your Progress
       </h3>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <div className={`text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-2 ${getContainerBorderColor()}`}>
           <Clock className="w-6 h-6 text-blue-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {formatDuration(stats.todayMinutes)}
@@ -131,7 +151,7 @@ export function SessionStats({}: SessionStatsProps) {
           <div className="text-sm text-gray-600 dark:text-gray-300">Today</div>
         </div>
 
-        <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+        <div className={`text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-2 ${getContainerBorderColor()}`}>
           <Calendar className="w-6 h-6 text-green-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {formatDuration(stats.weekMinutes)}
@@ -139,7 +159,7 @@ export function SessionStats({}: SessionStatsProps) {
           <div className="text-sm text-gray-600 dark:text-gray-300">This Week</div>
         </div>
 
-        <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+        <div className={`text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border-2 ${getContainerBorderColor()}`}>
           <Target className="w-6 h-6 text-orange-500 mx-auto mb-2" />
           <div className={`text-2xl font-bold ${getStreakColor(stats.streak)}`}>
             {stats.streak}
@@ -147,7 +167,7 @@ export function SessionStats({}: SessionStatsProps) {
           <div className="text-sm text-gray-600 dark:text-gray-300">Day Streak</div>
         </div>
 
-        <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+        <div className={`text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 ${getContainerBorderColor()}`}>
           <TrendingUp className="w-6 h-6 text-purple-500 mx-auto mb-2" />
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {stats.totalSessions}
@@ -204,7 +224,7 @@ export function SessionStats({}: SessionStatsProps) {
       </div>
 
       {/* Goals */}
-      <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div className={`mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border-2 ${getContainerBorderColor()}`}>
         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
           Daily Goals
         </h4>
