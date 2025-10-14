@@ -102,7 +102,7 @@ export function Auth({ onStartOnboarding }: AuthProps) {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true)
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}`,

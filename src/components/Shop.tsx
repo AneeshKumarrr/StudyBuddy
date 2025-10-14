@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Coins, ShoppingCart, Heart } from 'lucide-react'
+import { Coins } from 'lucide-react'
 
 interface ShopItem {
   id: string
@@ -10,7 +10,7 @@ interface ShopItem {
   name: string
   description: string
   cost: number
-  meta: any
+  meta: Record<string, unknown>
 }
 
 interface ShopProps {
@@ -90,12 +90,12 @@ export function Shop({ userCoins, onPurchase }: ShopProps) {
 
   const filteredItems = shopItems.filter(item => item.type === selectedCategory)
 
-  const getItemIcon = (item: ShopItem) => {
-    if (item.type === 'food') {
-      return <Heart className="w-5 h-5 text-green-500" />
-    }
-    return <ShoppingCart className="w-5 h-5 text-blue-500" />
-  }
+  // const getItemIcon = (item: ShopItem) => {
+  //   if (item.type === 'food') {
+  //     return <Heart className="w-5 h-5 text-green-500" />
+  //   }
+  //   return <ShoppingCart className="w-5 h-5 text-blue-500" />
+  // }
 
   const getItemEmoji = (item: ShopItem) => {
     if (item.type === 'food') {

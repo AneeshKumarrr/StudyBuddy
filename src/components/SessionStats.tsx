@@ -35,7 +35,7 @@ export function SessionStats({ selectedPet }: SessionStatsProps) {
   useEffect(() => {
     const loadUserStats = () => {
       // Get today's date for filtering
-      const today = new Date().toISOString().split('T')[0]
+      // const today = new Date().toISOString().split('T')[0]
       
       // Load session data from localStorage
       const sessionData = JSON.parse(localStorage.getItem('studybuddy_sessions') || '[]')
@@ -50,15 +50,15 @@ export function SessionStats({ selectedPet }: SessionStatsProps) {
         const dateStr = date.toISOString().split('T')[0]
         
         // Find sessions for this date
-        const daySessions = sessionData.filter((session: any) => 
+        const daySessions = sessionData.filter((session: { date: string }) => 
           session.date === dateStr
         )
         
-        const effectiveMinutes = daySessions.reduce((sum: number, session: any) => 
+        const effectiveMinutes = daySessions.reduce((sum: number, session: { effectiveMinutes?: number }) => 
           sum + (session.effectiveMinutes || 0), 0
         )
         
-        const totalMinutes = daySessions.reduce((sum: number, session: any) => 
+        const totalMinutes = daySessions.reduce((sum: number, session: { totalMinutes?: number }) => 
           sum + (session.totalMinutes || 0), 0
         )
         

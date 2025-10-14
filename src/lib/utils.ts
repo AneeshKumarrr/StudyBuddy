@@ -42,7 +42,7 @@ export function calculateCoinsFromLevel(level: number): number {
 // Session validation
 export function validateSession(effectiveMinutes: number, plannedMinutes: number): boolean {
   // Cap XP per minute and require reasonable session length
-  const maxXPPerMinute = 10
+  // const maxXPPerMinute = 10
   const minSessionMinutes = 5
   const maxSessionMinutes = 180 // 3 hours
   

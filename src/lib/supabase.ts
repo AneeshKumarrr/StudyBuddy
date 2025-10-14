@@ -34,7 +34,7 @@ export interface Database {
           level: number
           xp: number
           coins: number
-          cosmetics: any[]
+          cosmetics: unknown[]
           created_at: string
         }
         Insert: {
@@ -44,7 +44,7 @@ export interface Database {
           level?: number
           xp?: number
           coins?: number
-          cosmetics?: any[]
+          cosmetics?: unknown[]
           created_at?: string
         }
         Update: {
@@ -54,7 +54,7 @@ export interface Database {
           level?: number
           xp?: number
           coins?: number
-          cosmetics?: any[]
+          cosmetics?: unknown[]
           created_at?: string
         }
       }
@@ -122,21 +122,21 @@ export interface Database {
           sku: string
           type: 'food' | 'cosmetic'
           name: string
-          meta: any
+          meta: Record<string, unknown>
         }
         Insert: {
           id?: string
           sku: string
           type: 'food' | 'cosmetic'
           name: string
-          meta?: any
+          meta?: Record<string, unknown>
         }
         Update: {
           id?: string
           sku?: string
           type?: 'food' | 'cosmetic'
           name?: string
-          meta?: any
+          meta?: Record<string, unknown>
         }
       }
       inventories: {

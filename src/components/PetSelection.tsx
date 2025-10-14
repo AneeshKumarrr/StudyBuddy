@@ -264,7 +264,7 @@ export function PetSelection({ onBack, onSelect }: PetSelectionProps) {
 
         {/* Help Text */}
         <div className="text-center text-gray-600 dark:text-gray-300">
-          <p>Don't worry, you can always change your buddy later!</p>
+          <p>Don&apos;t worry, you can always change your buddy later!</p>
         </div>
       </div>
     </div>

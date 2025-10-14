@@ -11,7 +11,7 @@ interface Pet {
   level: number
   xp: number
   coins: number
-  cosmetics: any[]
+  cosmetics: unknown[]
 }
 
 interface PetDisplayProps {
@@ -84,11 +84,19 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
     }
   }
 
-  const handlePurchase = (item: any) => {
+  const handlePurchase = (item: { 
+    id: string
+    sku: string
+    type: 'food' | 'cosmetic'
+    name: string
+    description: string
+    cost: number
+    meta: Record<string, unknown>
+  }) => {
     if (pet.coins >= item.cost) {
       setPet(prev => ({ ...prev, coins: prev.coins - item.cost }))
-      if (item.type === 'food') {
-        setPet(prev => ({ ...prev, xp: prev.xp + item.meta.xp_gain }))
+      if (item.type === 'food' && item.meta && typeof item.meta === 'object' && 'xp_gain' in item.meta) {
+        setPet(prev => ({ ...prev, xp: prev.xp + (item.meta.xp_gain as number) }))
         setAnimation('eat')
         setTimeout(() => setAnimation('idle'), 1500)
       }

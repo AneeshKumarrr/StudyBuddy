@@ -132,7 +132,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   // Calculate effective time (time actually focused)
   const effectiveTime = Math.max(0, timeLeft - unfocusedTime)
   const progress = ((sessionSeconds - timeLeft) / sessionSeconds) * 100
-  const effectiveProgress = ((sessionSeconds - effectiveTime) / sessionSeconds) * 100
+  // const effectiveProgress = ((sessionSeconds - effectiveTime) / sessionSeconds) * 100
 
   const getContainerBorderColor = () => {
     if (!selectedPet) return 'border-blue-500'

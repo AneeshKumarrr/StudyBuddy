@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import { ArrowRight, Heart, Star, Zap } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 interface LandingPageProps {
   onStart: () => void

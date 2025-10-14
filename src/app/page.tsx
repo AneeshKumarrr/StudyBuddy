@@ -9,7 +9,14 @@ type AppState = 'landing' | 'pet-selection' | 'main'
 
 export default function Home() {
   const [appState, setAppState] = useState<AppState>('landing')
-  const [selectedPet, setSelectedPet] = useState<any>(null)
+  const [selectedPet, setSelectedPet] = useState<{
+    id: string
+    name: string
+    species: string
+    emoji: string
+    color: string
+    gradient: string
+  } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   // Check if user has already selected a pet
@@ -30,17 +37,24 @@ export default function Home() {
     setAppState('landing')
   }
 
-  const handlePetSelect = (pet: any) => {
+  const handlePetSelect = (pet: {
+    id: string
+    name: string
+    species: string
+    emoji: string
+    color: string
+    gradient: string
+  }) => {
     setSelectedPet(pet)
     localStorage.setItem('studybuddy_selected_pet', JSON.stringify(pet))
     setAppState('main')
   }
 
-  const handleReset = () => {
-    localStorage.removeItem('studybuddy_selected_pet')
-    setSelectedPet(null)
-    setAppState('landing')
-  }
+  // const handleReset = () => {
+  //   localStorage.removeItem('studybuddy_selected_pet')
+  //   setSelectedPet(null)
+  //   setAppState('landing')
+  // }
 
   // Show loading state while checking for saved pet
   if (isLoading) {
