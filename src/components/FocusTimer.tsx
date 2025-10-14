@@ -54,8 +54,10 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     }
   }, [state, timeLeft])
 
-  // Track page focus for anti-cheat
+  // Track page focus for anti-cheat (only when timer is running)
   useEffect(() => {
+    if (state !== 'running') return
+
     const handleVisibilityChange = () => {
       if (document.hidden) {
         setIsFocused(false)
@@ -85,7 +87,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
       document.removeEventListener('mousedown', handleInteraction)
       document.removeEventListener('keydown', handleInteraction)
     }
-  }, [lastInteraction, isFocused])
+  }, [lastInteraction, isFocused, state])
 
   const startTimer = useCallback(() => {
     setState('running')
@@ -137,7 +139,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   }, [sessionType, sessionDuration, unfocusedTime])
 
   // Calculate effective time (time actually focused)
-  const effectiveTime = Math.max(0, timeLeft - unfocusedTime)
+  const effectiveTime = Math.max(0, timeLeft)
   const progress = ((sessionSeconds - timeLeft) / sessionSeconds) * 100
   // const effectiveProgress = ((sessionSeconds - effectiveTime) / sessionSeconds) * 100
 
@@ -315,7 +317,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
               <div className="text-4xl font-mono font-bold text-gray-900 dark:text-white">
                 {formatTime(timeLeft)}
               </div>
-              {unfocusedTime > 0 && (
+              {unfocusedTime > 0 && state === 'running' && (
                 <div className="text-sm text-red-500 mt-1">
                   -{formatTime(unfocusedTime)} unfocused
                 </div>
