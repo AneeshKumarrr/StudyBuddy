@@ -62,9 +62,12 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
         setLastInteraction(Date.now())
       } else {
         setIsFocused(true)
-        const timeAway = Date.now() - lastInteraction
-        if (timeAway > 5000) { // 5 seconds grace period
-          setUnfocusedTime(prev => prev + Math.floor(timeAway / 1000))
+        // Only add unfocused time if we were actually unfocused
+        if (!isFocused && lastInteraction > 0) {
+          const timeAway = Date.now() - lastInteraction
+          if (timeAway > 5000) { // 5 seconds grace period
+            setUnfocusedTime(prev => prev + Math.floor(timeAway / 1000))
+          }
         }
       }
     }
@@ -82,7 +85,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
       document.removeEventListener('mousedown', handleInteraction)
       document.removeEventListener('keydown', handleInteraction)
     }
-  }, [lastInteraction])
+  }, [lastInteraction, isFocused])
 
   const startTimer = useCallback(() => {
     setState('running')
@@ -96,12 +99,16 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     setState('idle')
     setTimeLeft(sessionSeconds)
     setUnfocusedTime(0)
+    setIsFocused(true)
+    setLastInteraction(Date.now())
   }, [sessionSeconds])
 
   const stopTimer = useCallback(() => {
     setState('idle')
     setTimeLeft(sessionSeconds)
     setUnfocusedTime(0)
+    setIsFocused(true)
+    setLastInteraction(Date.now())
   }, [sessionSeconds])
 
   // Save session data to localStorage
