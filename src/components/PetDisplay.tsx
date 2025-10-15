@@ -427,7 +427,7 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
       <div className="mb-4">
         <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
           <span>Level {currentLevel}</span>
-          <span>{progress.current}/{progress.required} minutes of study</span>
+          <span>{Math.round(progress.current)}/{progress.required} minutes of study</span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
           <div 
@@ -449,7 +449,7 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
             <Zap className="w-4 h-4" />
-            <span className="font-semibold">{pet.studyMinutes}</span>
+            <span className="font-semibold">{Math.round(pet.studyMinutes)}</span>
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-300">Study Minutes</div>
         </div>
