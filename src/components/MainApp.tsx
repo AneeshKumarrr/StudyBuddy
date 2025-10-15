@@ -42,7 +42,7 @@ export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
           </div>
           {showAuth && (
             <div className="absolute top-0 right-0">
-              <Auth onStartOnboarding={onStartOnboarding} />
+              <Auth onStartOnboarding={onStartOnboarding} selectedPet={selectedPet} />
             </div>
           )}
         </header>

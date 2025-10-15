@@ -26,6 +26,22 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   const [isFocused, setIsFocused] = useState(true)
   const [studyMinutesElapsed, setStudyMinutesElapsed] = useState(0)
 
+  // Get pet theme colors for buttons
+  const getPetThemeColors = () => {
+    if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+    
+    switch (selectedPet.species) {
+      case 'wuffy':
+        return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600' }
+      case 'stuffy':
+        return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+      case 'muffy':
+        return { bg: 'bg-purple-500', hover: 'hover:bg-purple-600' }
+      default:
+        return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+    }
+  }
+
   // Calculate session duration based on type
   const sessionDuration = sessionType === 'pomodoro' ? 25 : customMinutes
   const sessionSeconds = sessionDuration * 60
@@ -333,7 +349,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
           {state === 'idle' && (
             <button
               onClick={startTimer}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+              className={`flex items-center gap-2 px-6 py-3 ${getPetThemeColors().bg} ${getPetThemeColors().hover} text-white rounded-lg font-medium transition-colors`}
             >
               <Play className="w-5 h-5" />
               Start

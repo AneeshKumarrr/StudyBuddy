@@ -7,13 +7,30 @@ import { LogIn, LogOut, User as UserIcon } from 'lucide-react'
 
 interface AuthProps {
   onStartOnboarding?: () => void
+  selectedPet?: { id: string; species: string; name: string }
 }
 
-export function Auth({ onStartOnboarding }: AuthProps) {
+export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showSignInModal, setShowSignInModal] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+
+  // Get pet theme colors
+  const getPetThemeColors = () => {
+    if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+    
+    switch (selectedPet.species) {
+      case 'wuffy':
+        return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600' }
+      case 'stuffy':
+        return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+      case 'muffy':
+        return { bg: 'bg-purple-500', hover: 'hover:bg-purple-600' }
+      default:
+        return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
+    }
+  }
 
   useEffect(() => {
     // Check if Supabase is properly configured
@@ -160,7 +177,7 @@ export function Auth({ onStartOnboarding }: AuthProps) {
     <>
       <button
         onClick={() => setShowSignInModal(true)}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+        className={`flex items-center gap-2 px-4 py-2 ${getPetThemeColors().bg} ${getPetThemeColors().hover} text-white rounded-lg font-medium transition-colors`}
       >
         <LogIn className="w-4 h-4" />
         Sign in to save your progress
