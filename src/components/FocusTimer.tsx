@@ -32,11 +32,11 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
     
     switch (selectedPet.species) {
-      case 'wuffy':
+      case 'dog':
         return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600' }
-      case 'stuffy':
+      case 'cat':
         return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
-      case 'muffy':
+      case 'rabbit':
         return { bg: 'bg-purple-500', hover: 'hover:bg-purple-600' }
       default:
         return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
