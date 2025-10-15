@@ -46,12 +46,24 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
           return prev - 1
         })
         
-        // Update study minutes in real-time (1/60th of a minute per second)
+        // Update study minutes and coins in real-time (1/60th of a minute per second)
         setStudyMinutesElapsed(prev => {
           const newMinutes = prev + (1/60)
           // Update localStorage in real-time
           const currentStudyMinutes = parseFloat(localStorage.getItem('studybuddy_study_minutes') || '0')
           localStorage.setItem('studybuddy_study_minutes', (currentStudyMinutes + (1/60)).toString())
+          
+          // Award 1 coin for every full minute of study
+          const newTotalMinutes = currentStudyMinutes + (1/60)
+          const fullMinutes = Math.floor(newTotalMinutes)
+          const previousFullMinutes = Math.floor(currentStudyMinutes)
+          
+          if (fullMinutes > previousFullMinutes) {
+            // We've completed another full minute, award 1 coin
+            const currentCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
+            localStorage.setItem('studybuddy_coins', (currentCoins + 1).toString())
+          }
+          
           // Trigger custom event for real-time updates
           window.dispatchEvent(new Event('studybuddy-update'))
           return newMinutes
@@ -119,12 +131,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     // Save back to localStorage
     localStorage.setItem('studybuddy_sessions', JSON.stringify(existingSessions))
     
-    // Award coins: 1 coin per minute of study
-    const coinsEarned = sessionDuration
-    const currentCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
-    localStorage.setItem('studybuddy_coins', (currentCoins + coinsEarned).toString())
-    
-    // Note: Study minutes are already being tracked in real-time, so no need to add them here
+    // Note: Coins and study minutes are already being tracked in real-time, so no need to add them here
     
     // Trigger storage event for other components
     window.dispatchEvent(new Event('storage'))
