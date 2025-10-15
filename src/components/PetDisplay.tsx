@@ -24,9 +24,10 @@ interface PetDisplayProps {
     gradient: string
   }
   onStartOnboarding?: () => void
+  onPetSelection?: () => void
 }
 
-export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) {
+export function PetDisplay({ selectedPet, onStartOnboarding, onPetSelection }: PetDisplayProps) {
   // Mock pet data - in real app, this would come from Supabase
   const [pet, setPet] = useState<Pet>({
     id: selectedPet?.id || '1',
@@ -486,7 +487,9 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
           onClick={() => {
             if (confirm('Are you sure you want to change your pet? This will reset your progress.')) {
               localStorage.removeItem('studybuddy_selected_pet')
-              if (onStartOnboarding) {
+              if (onPetSelection) {
+                onPetSelection()
+              } else if (onStartOnboarding) {
                 onStartOnboarding()
               } else {
                 window.location.reload()

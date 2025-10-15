@@ -21,6 +21,14 @@ interface MainAppProps {
 export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
   const [showAuth, setShowAuth] = useState(false)
 
+  const handlePetSelection = () => {
+    // Clear the selected pet and go to pet selection
+    localStorage.removeItem('studybuddy_selected_pet')
+    // Set app state to pet-selection
+    localStorage.setItem('studybuddy_app_state', 'pet-selection')
+    window.location.reload()
+  }
+
   useEffect(() => {
     // Check if Supabase is properly configured
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -50,7 +58,7 @@ export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Pet Display */}
           <div>
-            <PetDisplay selectedPet={selectedPet} onStartOnboarding={onStartOnboarding} />
+            <PetDisplay selectedPet={selectedPet} onStartOnboarding={onStartOnboarding} onPetSelection={handlePetSelection} />
           </div>
 
           {/* Focus Timer - Main Component */}
