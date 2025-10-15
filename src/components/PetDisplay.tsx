@@ -43,7 +43,7 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
 
   // Load pet data from localStorage
   useEffect(() => {
-    const savedStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
+    const savedStudyMinutes = parseFloat(localStorage.getItem('studybuddy_study_minutes') || '0')
     const savedCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
     const currentLevel = calculateLevelFromStudyMinutes(savedStudyMinutes)
     
@@ -55,10 +55,10 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
     }))
   }, [])
 
-  // Listen for storage changes (when new sessions are completed)
+  // Listen for storage changes (real-time updates during timer)
   useEffect(() => {
     const handleStorageChange = () => {
-      const savedStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
+      const savedStudyMinutes = parseFloat(localStorage.getItem('studybuddy_study_minutes') || '0')
       const savedCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
       const currentLevel = calculateLevelFromStudyMinutes(savedStudyMinutes)
       
@@ -80,8 +80,18 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
       })
     }
 
+    // Listen for both storage events and custom events
     window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    window.addEventListener('studybuddy-update', handleStorageChange)
+    
+    // Also check for updates every second during active sessions
+    const interval = setInterval(handleStorageChange, 1000)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('studybuddy-update', handleStorageChange)
+      clearInterval(interval)
+    }
   }, [])
 
   // Calculate level and progress

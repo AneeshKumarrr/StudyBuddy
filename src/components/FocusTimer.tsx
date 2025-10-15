@@ -52,8 +52,8 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
           // Update localStorage in real-time
           const currentStudyMinutes = parseFloat(localStorage.getItem('studybuddy_study_minutes') || '0')
           localStorage.setItem('studybuddy_study_minutes', (currentStudyMinutes + (1/60)).toString())
-          // Trigger storage event for other components
-          window.dispatchEvent(new Event('storage'))
+          // Trigger custom event for real-time updates
+          window.dispatchEvent(new Event('studybuddy-update'))
           return newMinutes
         })
       }, 1000)
