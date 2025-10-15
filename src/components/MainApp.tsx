@@ -22,10 +22,8 @@ export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
   const [showAuth, setShowAuth] = useState(false)
 
   const handlePetSelection = () => {
-    // Clear the selected pet and go to pet selection
-    localStorage.removeItem('studybuddy_selected_pet')
-    // Set app state to pet-selection
-    localStorage.setItem('studybuddy_app_state', 'pet-selection')
+    // Set a flag to go to pet selection without clearing the pet
+    localStorage.setItem('studybuddy_go_to_pet_selection', 'true')
     window.location.reload()
   }
 

@@ -22,7 +22,13 @@ export default function Home() {
   // Check if user has already selected a pet
   useEffect(() => {
     const savedPet = localStorage.getItem('studybuddy_selected_pet')
-    if (savedPet) {
+    const goToPetSelection = localStorage.getItem('studybuddy_go_to_pet_selection')
+    
+    if (goToPetSelection === 'true') {
+      // Clear the flag and go to pet selection
+      localStorage.removeItem('studybuddy_go_to_pet_selection')
+      setAppState('pet-selection')
+    } else if (savedPet) {
       setSelectedPet(JSON.parse(savedPet))
       setAppState('main')
     }
