@@ -46,6 +46,16 @@ export function Auth({ onStartOnboarding }: AuthProps) {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      
+      // Clear all localStorage data
+      localStorage.removeItem('studybuddy_selected_pet')
+      localStorage.removeItem('studybuddy_sessions')
+      localStorage.removeItem('studybuddy_study_minutes')
+      localStorage.removeItem('studybuddy_coins')
+      localStorage.removeItem('lastPetActivity')
+      
+      // Redirect to landing page by reloading
+      window.location.reload()
     } catch (error) {
       alert(error instanceof Error ? error.message : 'An error occurred')
     }
