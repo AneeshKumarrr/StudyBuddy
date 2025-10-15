@@ -22,9 +22,9 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
     if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
     
     switch (selectedPet.species) {
-      case 'dog':
-        return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600' }
       case 'cat':
+        return { bg: 'bg-orange-500', hover: 'hover:bg-orange-600' }
+      case 'dog':
         return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
       case 'rabbit':
         return { bg: 'bg-purple-500', hover: 'hover:bg-purple-600' }
