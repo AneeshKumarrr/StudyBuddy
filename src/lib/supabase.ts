@@ -3,12 +3,6 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-// Debug logging for environment variables
-if (process.env.NODE_ENV === 'development') {
-  console.log('Supabase URL:', supabaseUrl)
-  console.log('Supabase Key (first 10 chars):', supabaseAnonKey.substring(0, 10) + '...')
-  console.log('Is placeholder URL:', supabaseUrl.includes('placeholder'))
-}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 

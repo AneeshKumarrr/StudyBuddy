@@ -14,11 +14,9 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [showSignInModal, setShowSignInModal] = useState(false)
-  const [googleLoading, setGoogleLoading] = useState(false)
 
   // Get pet theme colors
   const getPetThemeColors = () => {
-    console.log('Auth - selectedPet:', selectedPet)
     if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
     
     switch (selectedPet.species) {
@@ -127,45 +125,6 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
     )
   }
 
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true)
-    try {
-      // Check if Supabase is properly configured
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-      
-      if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
-        throw new Error('Supabase is not properly configured. Please check your environment variables.')
-      }
-
-      console.log('Attempting Google OAuth sign-in...')
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
-          },
-        },
-      })
-      
-      if (error) {
-        console.error('Supabase OAuth error:', error)
-        throw error
-      }
-      
-      console.log('Google OAuth redirect initiated successfully')
-      // Close modal on successful redirect
-      setShowSignInModal(false)
-    } catch (error) {
-      console.error('Error signing in with Google:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      alert(`Google sign-in failed: ${errorMessage}\n\nPlease check:\n1. Environment variables are set in Vercel\n2. Google OAuth is enabled in Supabase\n3. Redirect URLs are configured correctly`)
-    } finally {
-      setGoogleLoading(false)
-    }
-  }
 
   const handleEmailSignIn = async () => {
     const email = prompt('Enter your email for magic link sign-in:')
@@ -217,26 +176,8 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
 
             <div className="space-y-4">
               <button
-                onClick={handleGoogleSignIn}
-                disabled={googleLoading}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-xl font-medium transition-colors"
-              >
-                {googleLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="w-5 h-5" />
-                    Continue with Google
-                  </>
-                )}
-              </button>
-
-              <button
                 onClick={handleEmailSignIn}
-                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
+                className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
               >
                 <UserIcon className="w-5 h-5" />
                 Continue with Email

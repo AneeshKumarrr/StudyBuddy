@@ -28,7 +28,6 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
 
   // Get pet theme colors for buttons
   const getPetThemeColors = () => {
-    console.log('FocusTimer - selectedPet:', selectedPet)
     if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
     
     switch (selectedPet.species) {
