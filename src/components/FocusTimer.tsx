@@ -24,8 +24,6 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   const [timeLeft, setTimeLeft] = useState(25 * 60) // 25 minutes in seconds
   const [state, setState] = useState<TimerState>('idle')
   const [isFocused, setIsFocused] = useState(true)
-  const [unfocusedTime, setUnfocusedTime] = useState(0)
-  const [lastInteraction, setLastInteraction] = useState(Date.now())
 
   // Calculate session duration based on type
   const sessionDuration = sessionType === 'pomodoro' ? 25 : customMinutes
@@ -54,40 +52,17 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     }
   }, [state, timeLeft])
 
-  // Track page focus for anti-cheat (only when timer is running)
+  // Simple focus tracking (no anti-cheat for now)
   useEffect(() => {
-    if (state !== 'running') return
-
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        setIsFocused(false)
-        setLastInteraction(Date.now())
-      } else {
-        setIsFocused(true)
-        // Only add unfocused time if we were actually unfocused
-        if (!isFocused && lastInteraction > 0) {
-          const timeAway = Date.now() - lastInteraction
-          if (timeAway > 5000) { // 5 seconds grace period
-            setUnfocusedTime(prev => prev + Math.floor(timeAway / 1000))
-          }
-        }
-      }
-    }
-
-    const handleInteraction = () => {
-      setLastInteraction(Date.now())
+      setIsFocused(!document.hidden)
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    document.addEventListener('mousedown', handleInteraction)
-    document.addEventListener('keydown', handleInteraction)
-
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
-      document.removeEventListener('mousedown', handleInteraction)
-      document.removeEventListener('keydown', handleInteraction)
     }
-  }, [lastInteraction, isFocused, state])
+  }, [])
 
   const startTimer = useCallback(() => {
     setState('running')
@@ -100,17 +75,13 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   const resetTimer = useCallback(() => {
     setState('idle')
     setTimeLeft(sessionSeconds)
-    setUnfocusedTime(0)
     setIsFocused(true)
-    setLastInteraction(Date.now())
   }, [sessionSeconds])
 
   const stopTimer = useCallback(() => {
     setState('idle')
     setTimeLeft(sessionSeconds)
-    setUnfocusedTime(0)
     setIsFocused(true)
-    setLastInteraction(Date.now())
   }, [sessionSeconds])
 
   // Save session data to localStorage
@@ -120,8 +91,8 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
       date: today,
       sessionType,
       totalMinutes: sessionDuration,
-      effectiveMinutes: sessionDuration - Math.floor(unfocusedTime / 60),
-      unfocusedMinutes: Math.floor(unfocusedTime / 60),
+      effectiveMinutes: sessionDuration,
+      unfocusedMinutes: 0,
       completedAt: new Date().toISOString()
     }
 
@@ -136,12 +107,10 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     
     // Trigger storage event for other components
     window.dispatchEvent(new Event('storage'))
-  }, [sessionType, sessionDuration, unfocusedTime])
+  }, [sessionType, sessionDuration])
 
-  // Calculate effective time (time actually focused)
-  const effectiveTime = Math.max(0, timeLeft)
+  // Calculate progress
   const progress = ((sessionSeconds - timeLeft) / sessionSeconds) * 100
-  // const effectiveProgress = ((sessionSeconds - effectiveTime) / sessionSeconds) * 100
 
   const getContainerBorderColor = () => {
     if (!selectedPet) return 'border-blue-500'
@@ -317,11 +286,6 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
               <div className="text-4xl font-mono font-bold text-gray-900 dark:text-white">
                 {formatTime(timeLeft)}
               </div>
-              {unfocusedTime > 0 && state === 'running' && (
-                <div className="text-sm text-red-500 mt-1">
-                  -{formatTime(unfocusedTime)} unfocused
-                </div>
-              )}
             </div>
           </div>
 
@@ -389,8 +353,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
 
         {/* Session Stats */}
         <div className="mt-6 text-sm text-gray-600 dark:text-gray-300">
-          <div>Effective time: {formatTime(sessionSeconds - effectiveTime)}</div>
-          <div>Total time: {formatTime(sessionSeconds - timeLeft)}</div>
+          <div>Session time: {formatTime(sessionSeconds - timeLeft)}</div>
         </div>
       </div>
     </div>
