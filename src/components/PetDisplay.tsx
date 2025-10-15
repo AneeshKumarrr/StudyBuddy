@@ -486,7 +486,6 @@ export function PetDisplay({ selectedPet, onStartOnboarding, onPetSelection }: P
         <button
           onClick={() => {
             if (confirm('Are you sure you want to change your pet? This will reset your progress.')) {
-              localStorage.removeItem('studybuddy_selected_pet')
               if (onPetSelection) {
                 onPetSelection()
               } else if (onStartOnboarding) {

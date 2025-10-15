@@ -24,13 +24,21 @@ export default function Home() {
     const savedPet = localStorage.getItem('studybuddy_selected_pet')
     const goToPetSelection = localStorage.getItem('studybuddy_go_to_pet_selection')
     
+    console.log('Debug - savedPet:', savedPet)
+    console.log('Debug - goToPetSelection:', goToPetSelection)
+    
     if (goToPetSelection === 'true') {
+      console.log('Debug - Going to pet selection')
       // Clear the flag and go to pet selection
       localStorage.removeItem('studybuddy_go_to_pet_selection')
       setAppState('pet-selection')
     } else if (savedPet) {
+      console.log('Debug - Going to main app')
       setSelectedPet(JSON.parse(savedPet))
       setAppState('main')
+    } else {
+      console.log('Debug - Going to landing')
+      setAppState('landing')
     }
     setIsLoading(false)
   }, [])

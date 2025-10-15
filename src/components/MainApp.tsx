@@ -22,8 +22,10 @@ export function MainApp({ selectedPet, onStartOnboarding }: MainAppProps) {
   const [showAuth, setShowAuth] = useState(false)
 
   const handlePetSelection = () => {
+    console.log('Debug - Change Pet button clicked')
     // Set a flag to go to pet selection without clearing the pet
     localStorage.setItem('studybuddy_go_to_pet_selection', 'true')
+    console.log('Debug - Flag set, reloading page')
     window.location.reload()
   }
 
