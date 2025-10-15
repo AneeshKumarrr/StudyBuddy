@@ -18,6 +18,7 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
 
   // Get pet theme colors
   const getPetThemeColors = () => {
+    console.log('Auth - selectedPet:', selectedPet)
     if (!selectedPet) return { bg: 'bg-blue-500', hover: 'hover:bg-blue-600' }
     
     switch (selectedPet.species) {
