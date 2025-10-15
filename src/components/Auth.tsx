@@ -130,6 +130,15 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true)
     try {
+      // Check if Supabase is properly configured
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
+        throw new Error('Supabase is not properly configured. Please check your environment variables.')
+      }
+
+      console.log('Attempting Google OAuth sign-in...')
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -140,13 +149,19 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
           },
         },
       })
-      if (error) throw error
       
+      if (error) {
+        console.error('Supabase OAuth error:', error)
+        throw error
+      }
+      
+      console.log('Google OAuth redirect initiated successfully')
       // Close modal on successful redirect
       setShowSignInModal(false)
     } catch (error) {
       console.error('Error signing in with Google:', error)
-      alert('Google sign-in failed. Please make sure Google OAuth is configured in your Supabase project.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`Google sign-in failed: ${errorMessage}\n\nPlease check:\n1. Environment variables are set in Vercel\n2. Google OAuth is enabled in Supabase\n3. Redirect URLs are configured correctly`)
     } finally {
       setGoogleLoading(false)
     }
