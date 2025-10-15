@@ -24,12 +24,13 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
   const [timeLeft, setTimeLeft] = useState(25 * 60) // 25 minutes in seconds
   const [state, setState] = useState<TimerState>('idle')
   const [isFocused, setIsFocused] = useState(true)
+  const [studyMinutesElapsed, setStudyMinutesElapsed] = useState(0)
 
   // Calculate session duration based on type
   const sessionDuration = sessionType === 'pomodoro' ? 25 : customMinutes
   const sessionSeconds = sessionDuration * 60
 
-  // Update timer
+  // Update timer and study minutes in real-time
   useEffect(() => {
     let interval: NodeJS.Timeout
 
@@ -43,6 +44,17 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
             return 0
           }
           return prev - 1
+        })
+        
+        // Update study minutes in real-time (1/60th of a minute per second)
+        setStudyMinutesElapsed(prev => {
+          const newMinutes = prev + (1/60)
+          // Update localStorage in real-time
+          const currentStudyMinutes = parseFloat(localStorage.getItem('studybuddy_study_minutes') || '0')
+          localStorage.setItem('studybuddy_study_minutes', (currentStudyMinutes + (1/60)).toString())
+          // Trigger storage event for other components
+          window.dispatchEvent(new Event('storage'))
+          return newMinutes
         })
       }, 1000)
     }
@@ -76,12 +88,14 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     setState('idle')
     setTimeLeft(sessionSeconds)
     setIsFocused(true)
+    setStudyMinutesElapsed(0)
   }, [sessionSeconds])
 
   const stopTimer = useCallback(() => {
     setState('idle')
     setTimeLeft(sessionSeconds)
     setIsFocused(true)
+    setStudyMinutesElapsed(0)
   }, [sessionSeconds])
 
   // Save session data to localStorage and award coins
@@ -110,9 +124,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     const currentCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
     localStorage.setItem('studybuddy_coins', (currentCoins + coinsEarned).toString())
     
-    // Track total study minutes
-    const currentStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
-    localStorage.setItem('studybuddy_study_minutes', (currentStudyMinutes + sessionDuration).toString())
+    // Note: Study minutes are already being tracked in real-time, so no need to add them here
     
     // Trigger storage event for other components
     window.dispatchEvent(new Event('storage'))
@@ -189,6 +201,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
                 setSessionType('pomodoro')
                 setTimeLeft(25 * 60)
                 setState('idle')
+                setStudyMinutesElapsed(0)
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 sessionType === 'pomodoro'
@@ -203,6 +216,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
                 setSessionType('custom')
                 setTimeLeft(customMinutes * 60)
                 setState('idle')
+                setStudyMinutesElapsed(0)
               }}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 sessionType === 'custom'
