@@ -84,7 +84,7 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     setIsFocused(true)
   }, [sessionSeconds])
 
-  // Save session data to localStorage
+  // Save session data to localStorage and award coins
   const saveSessionData = useCallback(() => {
     const today = new Date().toISOString().split('T')[0]
     const sessionData = {
@@ -104,6 +104,15 @@ export function FocusTimer({ selectedPet }: FocusTimerProps) {
     
     // Save back to localStorage
     localStorage.setItem('studybuddy_sessions', JSON.stringify(existingSessions))
+    
+    // Award coins: 1 coin per minute of study
+    const coinsEarned = sessionDuration
+    const currentCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
+    localStorage.setItem('studybuddy_coins', (currentCoins + coinsEarned).toString())
+    
+    // Track total study minutes
+    const currentStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
+    localStorage.setItem('studybuddy_study_minutes', (currentStudyMinutes + sessionDuration).toString())
     
     // Trigger storage event for other components
     window.dispatchEvent(new Event('storage'))

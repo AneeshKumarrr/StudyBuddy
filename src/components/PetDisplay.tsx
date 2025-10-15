@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { Heart, Star, Coins, Zap, ShoppingBag, RefreshCw } from 'lucide-react'
-import { calculateLevelFromXP, calculateXPProgress } from '@/lib/utils'
+import { calculateLevelFromStudyMinutes, calculateStudyProgress } from '@/lib/utils'
 import { Shop } from './Shop'
 
 interface Pet {
   id: string
   species: string
   level: number
-  xp: number
+  studyMinutes: number
   coins: number
   cosmetics: unknown[]
 }
@@ -32,7 +32,7 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
     id: selectedPet?.id || '1',
     species: selectedPet?.species || 'cat',
     level: 1,
-    xp: 0,
+    studyMinutes: 0,
     coins: 0,
     cosmetics: []
   })
@@ -41,18 +41,52 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
   const [animation, setAnimation] = useState<'idle' | 'eat' | 'sleep' | 'levelup'>('idle')
   const [showShop, setShowShop] = useState(false)
 
-  // Calculate level and progress
-  const currentLevel = calculateLevelFromXP(pet.xp)
-  const progress = calculateXPProgress(currentLevel, pet.xp)
-
-  // Update pet level if XP changed
+  // Load pet data from localStorage
   useEffect(() => {
-    if (currentLevel > pet.level) {
-      setPet(prev => ({ ...prev, level: currentLevel }))
-      setAnimation('levelup')
-      setTimeout(() => setAnimation('idle'), 2000)
+    const savedStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
+    const savedCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
+    const currentLevel = calculateLevelFromStudyMinutes(savedStudyMinutes)
+    
+    setPet(prev => ({
+      ...prev,
+      studyMinutes: savedStudyMinutes,
+      coins: savedCoins,
+      level: currentLevel
+    }))
+  }, [])
+
+  // Listen for storage changes (when new sessions are completed)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedStudyMinutes = parseInt(localStorage.getItem('studybuddy_study_minutes') || '0')
+      const savedCoins = parseInt(localStorage.getItem('studybuddy_coins') || '0')
+      const currentLevel = calculateLevelFromStudyMinutes(savedStudyMinutes)
+      
+      setPet(prev => {
+        const newPet = {
+          ...prev,
+          studyMinutes: savedStudyMinutes,
+          coins: savedCoins,
+          level: currentLevel
+        }
+        
+        // Trigger level up animation if level increased
+        if (currentLevel > prev.level) {
+          setAnimation('levelup')
+          setTimeout(() => setAnimation('idle'), 2000)
+        }
+        
+        return newPet
+      })
     }
-  }, [currentLevel, pet.level])
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
+  // Calculate level and progress
+  const currentLevel = calculateLevelFromStudyMinutes(pet.studyMinutes)
+  const progress = calculateStudyProgress(currentLevel, pet.studyMinutes)
 
   // Pet mood based on recent activity and progress
   useEffect(() => {
@@ -73,11 +107,13 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
         setMood('sleepy') // Needs attention
       }
     }
-  }, [pet.xp, pet.level])
+  }, [pet.studyMinutes, pet.level])
 
   const feedPet = () => {
     if (pet.coins >= 10) {
-      setPet(prev => ({ ...prev, coins: prev.coins - 10, xp: prev.xp + 5 }))
+      const newCoins = pet.coins - 10
+      setPet(prev => ({ ...prev, coins: newCoins }))
+      localStorage.setItem('studybuddy_coins', newCoins.toString())
       setAnimation('eat')
       setTimeout(() => setAnimation('idle'), 1500)
       localStorage.setItem('lastPetActivity', Date.now().toString())
@@ -94,9 +130,11 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
     meta: Record<string, unknown>
   }) => {
     if (pet.coins >= item.cost) {
-      setPet(prev => ({ ...prev, coins: prev.coins - item.cost }))
-      if (item.type === 'food' && item.meta && typeof item.meta === 'object' && 'xp_gain' in item.meta) {
-        setPet(prev => ({ ...prev, xp: prev.xp + (item.meta.xp_gain as number) }))
+      const newCoins = pet.coins - item.cost
+      setPet(prev => ({ ...prev, coins: newCoins }))
+      localStorage.setItem('studybuddy_coins', newCoins.toString())
+      
+      if (item.type === 'food') {
         setAnimation('eat')
         setTimeout(() => setAnimation('idle'), 1500)
       }
@@ -375,11 +413,11 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
         </div>
       </div>
 
-      {/* XP Progress */}
+      {/* Study Progress */}
       <div className="mb-4">
         <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
           <span>Level {currentLevel}</span>
-          <span>{progress.current}/{progress.required} XP</span>
+          <span>{progress.current}/{progress.required} minutes of study</span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
           <div 
@@ -401,9 +439,9 @@ export function PetDisplay({ selectedPet, onStartOnboarding }: PetDisplayProps) 
         <div className="text-center">
           <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
             <Zap className="w-4 h-4" />
-            <span className="font-semibold">{pet.xp}</span>
+            <span className="font-semibold">{pet.studyMinutes}</span>
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-300">XP</div>
+          <div className="text-xs text-gray-600 dark:text-gray-300">Study Minutes</div>
         </div>
       </div>
 

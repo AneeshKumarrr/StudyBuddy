@@ -5,25 +5,29 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-// XP and leveling calculations
-export function calculateLevelFromXP(xp: number): number {
-  // Level requirement: req(level) = round(50 * level^1.6)
+// Study minutes and leveling calculations
+export function calculateLevelFromStudyMinutes(studyMinutes: number): number {
+  // Level 1: 0-9 minutes, Level 2: 10-24 minutes, Level 3: 25-44 minutes, etc.
+  // Level requirement: 10 + (level-2)*5 for level >= 2
   let level = 1
-  while (calculateXPRequiredForLevel(level + 1) <= xp) {
+  while (calculateStudyMinutesRequiredForLevel(level + 1) <= studyMinutes) {
     level++
   }
   return level
 }
 
-export function calculateXPRequiredForLevel(level: number): number {
-  return Math.round(50 * Math.pow(level, 1.6))
+export function calculateStudyMinutesRequiredForLevel(level: number): number {
+  if (level <= 1) return 0
+  if (level === 2) return 10
+  // Level 3 needs 25 (10+15), Level 4 needs 45 (25+20), Level 5 needs 70 (45+25), etc.
+  return 10 + ((level - 2) * (level + 3)) / 2
 }
 
-export function calculateXPProgress(level: number, xp: number): { current: number; required: number; progress: number } {
-  const currentLevelXP = calculateXPRequiredForLevel(level)
-  const nextLevelXP = calculateXPRequiredForLevel(level + 1)
-  const current = xp - currentLevelXP
-  const required = nextLevelXP - currentLevelXP
+export function calculateStudyProgress(level: number, studyMinutes: number): { current: number; required: number; progress: number } {
+  const currentLevelMinutes = calculateStudyMinutesRequiredForLevel(level)
+  const nextLevelMinutes = calculateStudyMinutesRequiredForLevel(level + 1)
+  const current = studyMinutes - currentLevelMinutes
+  const required = nextLevelMinutes - currentLevelMinutes
   const progress = required > 0 ? (current / required) * 100 : 100
   
   return { current, required, progress }
