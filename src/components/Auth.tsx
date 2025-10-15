@@ -91,17 +91,17 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
   
   if (!supabaseUrl || !supabaseKey || supabaseUrl.includes('placeholder')) {
     return (
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 max-w-md">
-        <h3 className="text-lg font-semibold text-yellow-800 dark:text-yellow-200 mb-2">
-          🔧 Setup Required
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-md">
+        <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
+          🎯 StudyBuddy Ready!
         </h3>
-        <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
-          To enable authentication and data persistence, please set up your Supabase credentials.
+        <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+          Your progress is saved locally. To sync across devices, set up Supabase authentication.
         </p>
-        <div className="text-xs text-yellow-600 dark:text-yellow-400">
-          <p>1. Create a .env.local file</p>
-          <p>2. Add your Supabase URL and keys</p>
-          <p>3. Restart the development server</p>
+        <div className="text-xs text-blue-600 dark:text-blue-400">
+          <p>✅ All features work without sign-in</p>
+          <p>✅ Progress saved in browser</p>
+          <p>✅ Ready to study!</p>
         </div>
       </div>
     )
