@@ -130,20 +130,27 @@ export function Auth({ onStartOnboarding, selectedPet }: AuthProps) {
     const email = prompt('Enter your email for magic link sign-in:')
     if (email) {
       try {
+        console.log('🔍 Attempting email sign-in with:', email)
+        console.log('🔍 Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+        console.log('🔍 Supabase Key (first 10):', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 10))
+        
         const { error } = await supabase.auth.signInWithOtp({
           email,
           options: {
             emailRedirectTo: `${window.location.origin}`,
           },
         })
+        
         if (error) {
-          alert(error.message)
+          console.error('❌ Supabase error:', error)
+          alert(`Sign-in failed: ${error.message}`)
         } else {
+          console.log('✅ Magic link sent successfully')
           alert('Check your email for the magic link!')
         }
       } catch (error) {
-        console.error('Error with email sign-in:', error)
-        alert('Email sign-in failed. Please try again.')
+        console.error('❌ Email sign-in error:', error)
+        alert(`Email sign-in failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
     }
   }
